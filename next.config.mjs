@@ -5,6 +5,10 @@
  */
 const apiProxyTarget = process.env.API_PROXY_TARGET?.replace(/\/+$/, "");
 
+if (!apiProxyTarget) {
+    console.warn("⚠️  API_PROXY_TARGET is not set — /backend/* will 404 and login/products will fail. See .env.example");
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     output: "standalone",
