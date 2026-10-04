@@ -6,10 +6,26 @@ import { authApi } from "@/lib/api";
 const SESSION_KEY = "authSession";
 const AuthContext = createContext(null);
 
+const isNonEmptyString = (value) => typeof value === "string" && value.trim() !== "";
+
+/** A session only counts when it has a token and a well-formed user (rejects tampered/legacy entries). */
+function isValidSession(session) {
+    return (
+        Boolean(session) &&
+        isNonEmptyString(session.accessToken) &&
+        isNonEmptyString(session.user?.email) &&
+        isNonEmptyString(session.user?.name)
+    );
+}
+
 function readSession() {
     try {
         const raw = sessionStorage.getItem(SESSION_KEY);
-        return raw ? JSON.parse(raw) : null;
+        if (!raw) return null;
+        const session = JSON.parse(raw);
+        if (isValidSession(session)) return session;
+        sessionStorage.removeItem(SESSION_KEY);
+        return null;
     } catch {
         return null;
     }
@@ -30,7 +46,7 @@ export function AuthProvider({ children }) {
         const userId = email.trim();
         const { accessToken, tokenType } = await authApi.partnerLogin({ email: userId, password });
 
-        // 15482 returns no profile, so the user is built from the sign-in email
+        // partner_login returns no profile, so the user is built from the sign-in email
         const next = {
             user: { id: userId, name: userId, email: userId, role: "Solution Provider" },
             accessToken,
@@ -53,7 +69,7 @@ export function AuthProvider({ children }) {
             loggedInAt: session?.loggedInAt ?? null,
             accessToken: session?.accessToken ?? null,
             tokenType: session?.tokenType ?? null,
-            isAuthenticated: Boolean(session?.user),
+            isAuthenticated: isValidSession(session),
             isLoading,
             login,
             logout,

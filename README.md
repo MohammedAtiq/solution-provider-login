@@ -12,8 +12,8 @@ npm run dev                  # http://localhost:3000 → redirects to /login
 ```
 
 **Login** calls `POST /partner_login` on `NEXT_PUBLIC_API_BASE_URL`. A test account set in
-`NEXT_PUBLIC_DEMO_EMAIL` / `NEXT_PUBLIC_DEMO_PASSWORD` is shown on the login page with a **Use** button;
-leave them empty to hide it. All URLs and credentials live in `.env.local` — see `.env.example`.
+`NEXT_PUBLIC_DEMO_EMAIL` / `NEXT_PUBLIC_DEMO_PASSWORD` is shown on the login page with a **Use** button
+in development only — production builds never include it. All URLs and credentials live in `.env.local` — see `.env.example`.
 
 ## Structure
 
