@@ -19,8 +19,11 @@ import { isNumericQuery, mapCompany, mapProduct, validateSaudiGtin } from "@/uti
    1. Axios client
    ============================================ */
 
-// Defaults to the same-origin /backend proxy (next.config.mjs → API_PROXY_TARGET)
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "/backend";
+const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (typeof window !== "undefined" && !baseURL) {
+    console.warn("⚠️ NEXT_PUBLIC_API_BASE_URL is not set — see .env.example");
+}
 
 const apiClient = axios.create({
     baseURL,
