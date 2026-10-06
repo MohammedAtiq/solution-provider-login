@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { authApi } from "@/lib/api";
+import { DEMO_ACCESS_TOKEN, DEMO_USER, isDemoLogin } from "@/config/demoUser";
 
 const SESSION_KEY = "authSession";
 const AuthContext = createContext(null);
@@ -41,18 +42,21 @@ export function AuthProvider({ children }) {
         setIsLoading(false);
     }, []);
 
-    /** Calls /partner_login and caches the token in the session. Rejects with the backend message. */
+    /**
+     * Demo account signs in locally; anyone else goes to /partner_login and the
+     * token is cached in the session. Rejects with the backend message.
+     */
     const login = useCallback(async ({ email, password }) => {
-        const userId = email.trim();
-        const { accessToken, tokenType } = await authApi.partnerLogin({ email: userId, password });
-
-        // partner_login returns no profile, so the user is built from the sign-in email
-        const next = {
-            user: { id: userId, name: userId, email: userId, role: "Solution Provider" },
-            accessToken,
-            tokenType,
-            loggedInAt: new Date().toISOString(),
-        };
+        let next;
+        if (isDemoLogin({ email, password })) {
+            next = { user: DEMO_USER, accessToken: DEMO_ACCESS_TOKEN, tokenType: "demo", isDemo: true };
+        } else {
+            const userId = email.trim();
+            const { accessToken, tokenType } = await authApi.partnerLogin({ email: userId, password });
+            // partner_login returns no profile, so the user is built from the sign-in email
+            next = { user: { id: userId, name: userId, email: userId, role: "Solution Provider" }, accessToken, tokenType };
+        }
+        next.loggedInAt = new Date().toISOString();
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(next));
         setSession(next);
         return next.user;
@@ -69,6 +73,7 @@ export function AuthProvider({ children }) {
             loggedInAt: session?.loggedInAt ?? null,
             accessToken: session?.accessToken ?? null,
             tokenType: session?.tokenType ?? null,
+            isDemo: Boolean(session?.isDemo),
             isAuthenticated: isValidSession(session),
             isLoading,
             login,
@@ -80,10 +85,11 @@ export function AuthProvider({ children }) {
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-/** Cached partner token for non-React code (e.g. an axios interceptor). Null when signed out. */
+/** Cached partner token for non-React code (e.g. an axios interceptor). Null when signed out or in demo mode. */
 export function getAccessToken() {
     if (typeof window === "undefined") return null;
-    return readSession()?.accessToken ?? null;
+    const session = readSession();
+    return session && !session.isDemo ? session.accessToken : null;
 }
 
 export function useAuth() {

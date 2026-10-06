@@ -8,7 +8,7 @@ import * as Yup from "yup";
 import { toast } from "sonner";
 import { Info, Lock, Mail, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { DEMO_CREDENTIALS, HAS_DEMO_CREDENTIALS } from "@/config/demoUser";
+import { DEMO_CREDENTIALS } from "@/config/demoUser";
 import { ROUTES } from "@/config/routes";
 import { Button, Input } from "@/components/common";
 import gs1Logo from "@/assets/images/gs1-logo.png";
@@ -75,26 +75,24 @@ export default function LoginPage() {
                         <p className="mt-2 text-sm text-muted">Sign in to your solution provider account</p>
                     </div>
 
-                    {/* Demo credentials (only when set in .env) */}
-                    {HAS_DEMO_CREDENTIALS && (
-                        <div className="mb-6 rounded-xl border border-primary/15 bg-primary-soft p-4">
-                            <div className="flex items-start gap-3">
-                                <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                                <div className="min-w-0 flex-1 text-sm">
-                                    <p className="font-bold text-primary">Demo account</p>
-                                    <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-heading">
-                                        <dt className="text-muted">Email</dt>
-                                        <dd className="truncate font-mono font-semibold">{DEMO_CREDENTIALS.email}</dd>
-                                        <dt className="text-muted">Password</dt>
-                                        <dd className="font-mono font-semibold">{DEMO_CREDENTIALS.password}</dd>
-                                    </dl>
-                                </div>
-                                <Button variant="outline" size="sm" onClick={fillDemoCredentials} className="shrink-0">
-                                    Use
-                                </Button>
+                    {/* Demo credentials */}
+                    <div className="mb-6 rounded-xl border border-primary/15 bg-primary-soft p-4">
+                        <div className="flex items-start gap-3">
+                            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                            <div className="min-w-0 flex-1 text-sm">
+                                <p className="font-bold text-primary">Demo account</p>
+                                <dl className="mt-1.5 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-heading">
+                                    <dt className="text-muted">Email</dt>
+                                    <dd className="truncate font-mono font-semibold">{DEMO_CREDENTIALS.email}</dd>
+                                    <dt className="text-muted">Password</dt>
+                                    <dd className="font-mono font-semibold">{DEMO_CREDENTIALS.password}</dd>
+                                </dl>
                             </div>
+                            <Button variant="outline" size="sm" onClick={fillDemoCredentials} className="shrink-0">
+                                Use
+                            </Button>
                         </div>
-                    )}
+                    </div>
 
                     <form noValidate onSubmit={formik.handleSubmit} className="space-y-4">
                         <Input

@@ -1,13 +1,22 @@
 /**
- * Test partner account shown on the login page's "Demo account" box — set in .env.
- * Development only: production builds always drop these values, so a real
- * password can never end up in the public JS bundle.
+ * Built-in demo account — signs in locally without calling the backend, so the
+ * portal can be shown anywhere. Any other email goes to /partner_login.
+ * This is public by design: never reuse these values for a real account.
  */
-const isDev = process.env.NODE_ENV !== "production";
-
 export const DEMO_CREDENTIALS = {
-    email: isDev ? process.env.NEXT_PUBLIC_DEMO_EMAIL || "" : "",
-    password: isDev ? process.env.NEXT_PUBLIC_DEMO_PASSWORD || "" : "",
+    email: "demo@gmail.com",
+    password: "123456789",
 };
 
-export const HAS_DEMO_CREDENTIALS = Boolean(DEMO_CREDENTIALS.email && DEMO_CREDENTIALS.password);
+export const DEMO_USER = {
+    id: "demo-user",
+    name: "Demo User",
+    email: DEMO_CREDENTIALS.email,
+    role: "Solution Provider",
+};
+
+/** Placeholder so the session passes validation — never sent to any API. */
+export const DEMO_ACCESS_TOKEN = "demo-access-token";
+
+export const isDemoLogin = ({ email, password }) =>
+    email.trim().toLowerCase() === DEMO_CREDENTIALS.email && password === DEMO_CREDENTIALS.password;
