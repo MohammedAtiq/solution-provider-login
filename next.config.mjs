@@ -1,5 +1,8 @@
 const isDev = process.env.NODE_ENV !== "production";
 
+/** Backend the /backend/* proxy forwards to (set in .env.production). Unset → no proxy. */
+const apiProxyTarget = process.env.API_PROXY_TARGET?.replace(/\/+$/, "");
+
 /** Origin of the backend API, so the CSP lets the browser call it. */
 function apiOrigin() {
     try {
@@ -41,6 +44,10 @@ const nextConfig = {
     poweredByHeader: false,
     async redirects() {
         return [{ source: "/", destination: "/login", permanent: false }];
+    },
+    async rewrites() {
+        if (!apiProxyTarget) return [];
+        return [{ source: "/backend/:path*", destination: `${apiProxyTarget}/:path*` }];
     },
     async headers() {
         return [{ source: "/:path*", headers: securityHeaders }];
